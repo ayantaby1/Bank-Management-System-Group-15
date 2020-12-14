@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>View Transactions</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">Bank Management System</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Admin
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="approve_user.html">Approve Account</a>
+          <a class="dropdown-item" href="approve_loan.html">Approve Loans</a>
+          <a class="dropdown-item" href="modify_account.html">Modify Account</a>
+          <a class="dropdown-item" href="delete_user.html">Delete Account</a>
+          <a class="dropdown-item" href="#">View All Accounts</a>
+          <a class="dropdown-item" href="#">View All Transactions</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Customer
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="create_account.html">Request Account</a>
+          <a class="dropdown-item" href="req_loan.html">Request Loan</a>
+          <a class="dropdown-item" href="deposit.html">Deposit Funds</a>
+          <a class="dropdown-item" href="withdraw.html">Withdraw Funds</a>
+          <a class="dropdown-item" href="transfer.html">Transfer Funds</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+</head>
+<body>
+  
+
+	<section class="container-fluid">
+		<section class="col-12 col-sm-6 col-md-3">
+      <h1>All Transactions:</h1>
+      <form id="myForm">
+        
+        <table class="column3 tworow" style="width:400px; background-color:#aaf;" align="center" border="1">
+          <thead>
+            <tr class="header" style="color:#ffffff">
+              <th class="tab_header">Transaction ID</th>
+              <th class="tab_header">Transaction Type</th>
+              <th class="tab_header">Sender Account #</th>
+              <th class="tab_header">Receiver Account #</th>
+              <th class="tab_header">Amount</th>
+              <th class="tab_header">Transaction Date</th>
+            </tr>
+            
+          </thead>
+          <tbody id="body_rows">
+            <!--This will be filled by Javascript-->
+          </tbody>
+        </table> 
+      </form>
+      <script>
+        var pending_rows
+        fetch('http://localhost:3000/transactions/',{
+        method: 'get'
+        }).then(function(response){
+          return response.text();
+        }).then(async function(text){
+          console.log(text)
+          if (text == '[]')
+          {
+            alert('There are no transactions.')
+          }
+          
+          let data = JSON.parse(text)
+          
+          let htmlString = ''
+          
+          for (let row of data) {
+            
+            htmlString += '<tr>'
+            htmlString += `<td>${row.trans_id}</td>`
+            htmlString += `<td>${row.trans_type}</td>`
+            htmlString += `<td>${row.sender_account}</td>`
+            htmlString += `<td>${row.receiver_account}</td>`
+            htmlString += `<td>${row.amount}</td>`
+            htmlString += `<td>${row.trans_date}</td>`
+            htmlString += '</tr>'
+            document.getElementById('body_rows').innerHTML = htmlString
+            
+            
+            //console.log("success")
+            
+          }
+          //console.log("count",count1)
+        }).catch(function(error) {
+                console.error(error);
+              })
+          
+          
+    
+          
+      </script>
+
+			
+		</section>
+	</section>
+
+</body>
+</html>

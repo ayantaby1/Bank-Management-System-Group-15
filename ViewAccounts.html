@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>View Accounts</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">Bank Management System</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Admin
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="approve_user.html">Approve Account</a>
+          <a class="dropdown-item" href="approve_loan.html">Approve Loans</a>
+          <a class="dropdown-item" href="modify_account.html">Modify Account</a>
+          <a class="dropdown-item" href="delete_user.html">Delete Account</a>
+          <a class="dropdown-item" href="#">View All Accounts</a>
+          <a class="dropdown-item" href="#">View All Transactions</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Customer
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="create_account.html">Request Account</a>
+          <a class="dropdown-item" href="req_loan.html">Request Loan</a>
+          <a class="dropdown-item" href="deposit.html">Deposit Funds</a>
+          <a class="dropdown-item" href="withdraw.html">Withdraw Funds</a>
+          <a class="dropdown-item" href="transfer.html">Transfer Funds</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+</head>
+<body>
+	
+  
+
+	<section class="container-fluid">
+		<section class="col-12 col-sm-6 col-md-3">
+      <h1>All Accounts:</h1>
+      <form id="myForm">
+        
+        <table class="column3 tworow" style="width:400px; background-color:#aaf;" align="center" border="1">
+          <thead>
+            <tr class="header" style="color:#ffffff">
+                <th class="tab_header">Customer ID</th>
+              <th class="tab_header">First Name</th>
+              <th class="tab_header">Branch Code</th>
+              <th class="tab_header">Email</th>
+              <th class="tab_header">Password</th>
+              <th class="tab_header">City</th>
+              <th class="tab_header">Phone #</th>
+              <th class="tab_header">CNIC</th>
+              <th class="tab_header">Address</th>
+              <th class="tab_header">Zip</th>
+              <th class="tab_header">Last Login</th>
+              <th class="tab_header">Balance</th>
+              <th class="tab_header">Credit Card #</th>
+              <th class="tab_header">Account Type</th>
+              <th class="tab_header">Date of Opening</th>
+              <th class="tab_header">Loan ID</th>
+              <th class="tab_header">Last Transaction</th>
+            </tr>
+            
+          </thead>
+          <tbody id="body_rows">
+            <!--This will be filled by Javascript-->
+          </tbody>
+        </table> 
+      </form>
+      <script>
+        var pending_rows
+        fetch('http://localhost:3000/accounts/',{
+        method: 'get'
+        }).then(function(response){
+          return response.text();
+        }).then(async function(text){
+          console.log(text)
+          if (text == '[]')
+          {
+            alert('There are no transactions.')
+          }
+          
+          let data = JSON.parse(text)
+          
+          let htmlString = ''
+          
+          for (let row of data) {
+            
+            htmlString += '<tr>'
+            htmlString += `<td>${row.customer_id}</td>`
+            htmlString += `<td>${row.name}</td>`
+            htmlString += `<td>${row.branch_id}</td>`
+            htmlString += `<td>${row.Email}</td>`
+            htmlString += `<td>${row.password}</td>`
+            htmlString += `<td>${row.city}</td>`
+            htmlString += `<td>${row.phone}</td>`
+            htmlString += `<td>${row.cnic}</td>`
+            htmlString += `<td>${row.Address}</td>`
+            htmlString += `<td>${row.Zip}</td>`
+            htmlString += `<td>${row.last_login}</td>`
+            htmlString += `<td>${row.balance}</td>`
+            htmlString += `<td>${row.cc_number}</td>`
+            htmlString += `<td>${row.account_type}</td>`
+            htmlString += `<td>${row.date_of_opening}</td>`
+            htmlString += `<td>${row.loan_id}</td>`
+            htmlString += `<td>${row.last_trans}</td>`
+            htmlString += '</tr>'
+            document.getElementById('body_rows').innerHTML = htmlString
+            
+            
+            //console.log("success")
+            
+          }
+          //console.log("count",count1)
+        }).catch(function(error) {
+                console.error(error);
+              })
+          
+          
+    
+          
+      </script>
+
+			
+		</section>
+	</section>
+
+</body>
+</html>

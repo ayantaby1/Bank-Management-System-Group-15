@@ -1,0 +1,195 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AccountUpdate`(
+IN _account_number INT,
+IN _balance INT
+)
+BEGIN
+	
+	UPDATE account_details
+	SET
+	balance = _balance
+	WHERE account_number = _account_number;
+
+
+	SELECT account_number as 'account_number';
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `BalanceUpdate`(
+IN _cmd INT,
+IN _account_number INT,
+IN _receiver_account int,
+IN _balance INT,
+IN _amount INT
+)
+BEGIN
+	
+	UPDATE account_details
+	SET
+	balance = _balance
+	WHERE account_number = _account_number;
+    
+    IF _cmd = 0 THEN
+		INSERT INTO transactions(trans_type, sender_account, receiver_account, amount)
+		VALUES ("Withdrawal", _account_number, _account_number, _amount );
+        UPDATE account_details
+		SET
+		last_trans = (select MAX(trans_id) from transactions where (sender_account = _account_number) or (receiver_account = _account_number))
+        WHERE account_number = _account_number;
+        
+	ELSEIF _cmd = 1 THEN
+		INSERT INTO transactions(trans_type, sender_account, receiver_account, amount)
+		VALUES ("Deposit", _account_number, _account_number, _amount );
+        UPDATE account_details
+		SET
+		last_trans = (select MAX(trans_id) from transactions where (sender_account = _account_number) or (receiver_account = _account_number))
+        WHERE account_number = _account_number;
+
+	end if;
+	SELECT account_number as 'account_number';
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `BalanceUpdate`(
+IN _cmd INT,
+IN _account_number INT,
+IN _receiver_account int,
+IN _balance INT,
+IN _amount INT
+)
+BEGIN
+	
+	UPDATE account_details
+	SET
+	balance = _balance
+	WHERE account_number = _account_number;
+    
+    IF _cmd = 0 THEN
+		INSERT INTO transactions(trans_type, sender_account, receiver_account, amount)
+		VALUES ("Withdrawal", _account_number, _account_number, _amount );
+        UPDATE account_details
+		SET
+		last_trans = (select MAX(trans_id) from transactions where (sender_account = _account_number) or (receiver_account = _account_number))
+        WHERE account_number = _account_number;
+        
+	ELSEIF _cmd = 1 THEN
+		INSERT INTO transactions(trans_type, sender_account, receiver_account, amount)
+		VALUES ("Deposit", _account_number, _account_number, _amount );
+        UPDATE account_details
+		SET
+		last_trans = (select MAX(trans_id) from transactions where (sender_account = _account_number) or (receiver_account = _account_number))
+        WHERE account_number = _account_number;
+
+	end if;
+	SELECT account_number as 'account_number';
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `LoanApprove`(
+IN _cmd INT,
+IN _customer_id INT
+)
+BEGIN
+	IF _cmd = 1 THEN
+		select loan_id, account_number, interest, amount INTO @id,@num,@inter,@am from loan_pending where account_number = _customer_id;
+		INSERT INTO loan(account_number, interest, amount, duration, installments_remaining )
+		VALUES (@num, @inter, @am, 12, 4);
+        UPDATE account_details
+		SET
+		loan_id = (select max(loan_id) from loan where account_number = _customer_id)
+		WHERE account_number = _customer_id;
+        DELETE from loan_pending where account_number = _customer_id;
+        
+	ElseIf _cmd = 2 THEN
+        DELETE from loan_pending where account_number = _customer_id;
+		
+	END IF;
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `LoansAdd`(
+IN _customer_id INT,
+IN _interest varchar(50),
+IN _amount INT,
+IN _name VARCHAR(50) ,
+IN _branch_id INT,
+IN _cnic int, 
+IN _Email varchar(60)
+)
+BEGIN
+        INSERT INTO loan_pending(account_number, interest, amount, name, branch_id, cnic, Email)
+		VALUES (_customer_id, _interest, _amount, _name, _branch_id, _cnic, _Email);
+        
+        
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `PendingAddOrEdit`(
+IN _customer_id INT,
+IN _name VARCHAR(50),
+IN _branch_id INT,
+IN _password VARCHAR(50),
+IN _city VARCHAR(50),
+IN _phone double,
+IN _cnic INT,
+IN _Address varchar(100),
+IN _Zip int,
+IN _Email varchar(60)
+)
+BEGIN
+	IF _customer_id = 0 THEN
+		INSERT INTO pending_approval(branch_id,name, password, city, phone, cnic, Address, Zip, Email)
+		VALUES ((select branch_id from branch_details where branch_id = _branch_id), _name, _password, _city, _phone, _cnic, _Address, _Zip, _Email);
+		
+	END IF;
+
+	SELECT customer_id as 'customer_id';
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `PendingApprove`(
+IN _cmd INT,
+IN _customer_id INT
+)
+BEGIN
+	IF _cmd = 1 THEN
+		select branch_id,name, password, city, phone, cnic, Address, Zip, Email INTO @br,@na,@pa,@ci,@ph,@cn,@ad,@zi,@em from pending_approval where customer_id = _customer_id;
+		INSERT INTO customer_details(branch_id,name, password, city, phone, cnic, Address, Zip, Email)
+		VALUES ((select branch_id from branch_details where branch_id = @br), @na,@pa,@ci,@ph,@cn,@ad,@zi,@em);
+        INSERT INTO account_details(account_number, loan_id, last_trans)
+		VALUES ((select customer_id from customer_details where cnic = @cn), (select loan_id from loan where loan_id = 0), (select trans_id from transactions where trans_id = 0));
+        DELETE from pending_approval where customer_id = _customer_id;
+        
+	ElseIf _cmd = 2 THEN
+        DELETE from pending_approval where customer_id = _customer_id;
+		
+	END IF;
+
+	SELECT customer_id as 'customer_id';
+END
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Transfer`(
+IN _sender_account INT,
+IN _receiver_account int,
+IN _sender_balance INT,
+IN _receiver_balance INT,
+IN _amount INT
+)
+BEGIN
+	
+	UPDATE account_details
+	SET
+	balance = _sender_balance
+	WHERE account_number = _sender_account;
+    
+    UPDATE account_details
+	SET
+	balance = _receiver_balance
+	WHERE account_number = _receiver_account;
+    
+	INSERT INTO transactions(trans_type, sender_account, receiver_account, amount)
+	VALUES ("Transfer", _sender_account, _receiver_account, _amount );
+    
+	UPDATE account_details
+	SET
+	last_trans = (select MAX(trans_id) from transactions where (sender_account = _sender_account))
+	WHERE account_number = _sender_account;
+    
+    UPDATE account_details
+	SET
+	last_trans = (select MAX(trans_id) from transactions where (receiver_account = _receiver_account))
+	WHERE account_number = _receiver_account;
+END
